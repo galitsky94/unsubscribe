@@ -39,7 +39,7 @@ class TiltMazeGame {
   private acceleration: Position = { x: 0, y: 0 };
   private deviceOrientationPermissionGranted = false;
   private readonly friction = 0.92;
-  private readonly maxSpeed = 2.5;
+  private readonly maxSpeed = 3.5;
   private readonly tiltScale = 0.05;
   private readonly mazeSize = 8;
   private readonly tiltDeadzone = 1;
@@ -389,7 +389,8 @@ class TiltMazeGame {
 
     const xScale = gamma < 0 ? this.tiltScale * 1.4 : this.tiltScale;
     this.acceleration.x = (gamma / 45) * xScale * 4;
-    this.acceleration.y = (beta / 45) * this.tiltScale * 4;
+    const yScale = beta < 0 ? this.tiltScale * 1.4 : this.tiltScale;
+    this.acceleration.y = (beta / 45) * yScale * 4;
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
