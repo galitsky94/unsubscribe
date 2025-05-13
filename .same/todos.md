@@ -8,8 +8,17 @@
 - [x] Add tilt controls for movement
 - [x] Add keyboard controls for desktop testing
 - [x] Implement start, game over, and win screens
-- [x] Add trap holes for added difficulty
 - [x] Make game responsive to different screen sizes
+- [x] Implement deterministic maze generation with seed
+- [x] Create braid maze with multiple solution paths
+- [x] Add coordinate labels around the maze
+- [x] Implement moving walls that open and close periodically
+- [x] Add smooth animation for the moving walls
+- [x] Create flash sale popup during gameplay
+- [x] Add countdown timer to the flash sale popup
+- [x] Implement multi-step unsubscribe flow
+- [x] Remove "Tilt Maze" screen that appears before the game starts
+- [x] Increase flash sale popup timer from 5 to 10 seconds
 
 ## In Progress
 - [ ] None
