@@ -105,6 +105,87 @@
       #dismiss-permission-message:hover {
         background-color: #0b7dda;
       }
+
+      /* Annoying Flash Sale Pop-up */
+      #flash-sale-popup {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 400px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        z-index: 30;
+        text-align: center;
+        padding: 20px;
+        animation: bounce 0.5s infinite alternate;
+      }
+
+      @keyframes bounce {
+        from { transform: translate(-50%, -50%) scale(1); }
+        to { transform: translate(-50%, -50%) scale(1.03); }
+      }
+
+      .flash-header {
+        background-color: #FF5252;
+        color: white;
+        margin: -20px -20px 15px -20px;
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .flash-body {
+        margin-bottom: 20px;
+      }
+
+      .sale-countdown {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #FF5252;
+      }
+
+      .flash-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+
+      .flash-buttons button {
+        min-width: 130px;
+        margin: 5px;
+      }
+
+      .accept-btn {
+        background-color: #FF5252 !important;
+      }
+
+      .accept-btn:hover {
+        background-color: #FF3030 !important;
+      }
+
+      .popup-close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 30px;
+        height: 30px;
+        background-color: transparent;
+        border: none;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+      }
     </style>
   </head>
   <body>
@@ -120,7 +201,74 @@
         <p>Congratulations on completing the maze!</p>
         <button id="restart-button">Play Again</button>
       </div>
+
+      <!-- Annoying Flash Sale Pop-up -->
+      <div id="flash-sale-popup" class="hidden">
+        <button class="popup-close" id="close-popup">✕</button>
+        <div class="flash-header">
+          LIMITED TIME OFFER!
+        </div>
+        <div class="flash-body">
+          <h2>FLASH SALE!</h2>
+          <p>Subscribe to our Premium Plan and get <strong>50% OFF</strong> your first month!</p>
+          <div class="sale-countdown">Offer ends in: 00:59</div>
+          <p>Get exclusive access to ad-free gameplay, extra levels, and premium features!</p>
+        </div>
+        <div class="flash-buttons">
+          <button class="accept-btn" id="accept-offer">Get 50% OFF</button>
+          <button id="decline-offer">No thanks</button>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
+
+    <!-- Flash Sale Pop-up Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let flashPopupShown = false;
+        const flashPopup = document.getElementById('flash-sale-popup');
+        const closePopupBtn = document.getElementById('close-popup');
+        const acceptBtn = document.getElementById('accept-offer');
+        const declineBtn = document.getElementById('decline-offer');
+        const startButton = document.getElementById('start-button');
+
+        function showFlashPopup() {
+          if (!flashPopupShown) {
+            flashPopup.classList.remove('hidden');
+            flashPopupShown = true;
+
+            // Start countdown timer
+            let seconds = 59;
+            const countdownEl = document.querySelector('.sale-countdown');
+            const countdownInterval = setInterval(() => {
+              seconds--;
+              if (seconds < 0) {
+                clearInterval(countdownInterval);
+                return;
+              }
+              const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
+              countdownEl.textContent = `Offer ends in: 00:${displaySeconds}`;
+            }, 1000);
+          }
+        }
+
+        function closeFlashPopup() {
+          flashPopup.classList.add('hidden');
+        }
+
+        // Show popup 5 seconds after game starts
+        startButton.addEventListener('click', function() {
+          setTimeout(showFlashPopup, 5000);
+        });
+
+        // Close popup when buttons are clicked
+        closePopupBtn.addEventListener('click', closeFlashPopup);
+        acceptBtn.addEventListener('click', function() {
+          alert("Congratulations! You've claimed your 50% discount. Please enter your payment details to continue.");
+          closeFlashPopup();
+        });
+        declineBtn.addEventListener('click', closeFlashPopup);
+      });
+    </script>
   </body>
 </html>
