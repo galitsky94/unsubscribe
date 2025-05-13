@@ -262,32 +262,83 @@ class TiltMazeGame {
     maze[3][5].walls.bottom = false;
     maze[4][5].walls.top = false;
 
-    // Replace the E4-F4/F4-G4 moving wall with a new I0-I1/H1-I1 wall
-    // Remove the previous setup
-    maze[4][4].walls.right = false; // E4-F4 wall - remove
-    maze[4][5].walls.left = false; // E4-F4 wall (other side) - remove
-    maze[4][5].walls.right = false; // F4-G4 wall - remove
-    maze[4][6].walls.left = false; // F4-G4 wall (other side) - remove
+    // Remove any previous moving wall configurations
+    maze[0][8].walls.bottom = false;
+    maze[1][8].walls.top = false;
+    maze[1][7].walls.right = false;
+    maze[1][8].walls.left = false;
 
-    // Setup the new moving wall
-    // Initially set the horizontal wall I0-I1
-    maze[0][8].walls.bottom = true; // I0 bottom wall
-    maze[1][8].walls.top = true; // I1 top wall
-    // H1-I1 wall is initially not present
-    maze[1][7].walls.right = false; // H1 right wall
-    maze[1][8].walls.left = false; // I1 left wall
+    // Setup all four moving walls as requested:
 
-    // Update moving wall data structure
+    // 1. Wall between F4-F5 moving to G4-G5
+    maze[4][5].walls.bottom = true; // F4-F5 wall - starting position
+    maze[5][5].walls.top = true;    // F5 top
+    maze[4][6].walls.bottom = false; // G4-G5 wall - not present initially
+    maze[5][6].walls.top = false;    // G5 top
+
+    // 2. Wall between I8-J8 (vertical) moving to J7-J8 (horizontal)
+    maze[8][8].walls.right = true;  // I8-J8 wall - starting position
+    maze[8][9].walls.left = true;   // J8 left
+    maze[7][9].walls.bottom = false; // J7-J8 wall - not present initially
+    maze[8][9].walls.top = false;    // J8 top
+
+    // 3. Wall between C8-D8 moving to D8-E8
+    maze[8][2].walls.right = true;  // C8-D8 wall - starting position
+    maze[8][3].walls.left = true;   // D8 left
+    maze[8][3].walls.right = false; // D8-E8 wall - not present initially
+    maze[8][4].walls.left = false;  // E8 left
+
+    // 4. Wall between B4-C4 (vertical) moving to C4-C5 (horizontal)
+    maze[4][1].walls.right = true;  // B4-C4 wall - starting position
+    maze[4][2].walls.left = true;   // C4 left
+    maze[4][2].walls.bottom = false; // C4-C5 wall - not present initially
+    maze[5][2].walls.top = false;    // C5 top
+
+    // Update moving walls data structure to track all four walls
     this.movingWalls = [
+      // Wall 1: F4-F5 moving to G4-G5 (horizontal movement)
       {
-        position1: { x: 8, y: 0, side: 'bottom' }, // I0-I1 wall (horizontal)
-        position2: { x: 7, y: 1, side: 'right' }, // H1-I1 wall (vertical)
-        currentPosition: 1, // Start with position 1 (horizontal I0-I1)
+        position1: { x: 5, y: 4, side: 'bottom' }, // F4-F5
+        position2: { x: 6, y: 4, side: 'bottom' }, // G4-G5
+        currentPosition: 1,
         timer: 0,
         interval: 5000, // 5 seconds
         animating: false,
         animationProgress: 0,
         animationDuration: 200 // 200ms animation
+      },
+      // Wall 2: I8-J8 (vertical) moving to J7-J8 (horizontal)
+      {
+        position1: { x: 8, y: 8, side: 'right' }, // I8-J8
+        position2: { x: 9, y: 7, side: 'bottom' }, // J7-J8
+        currentPosition: 1,
+        timer: 0,
+        interval: 6000, // 6 seconds (slightly different timing)
+        animating: false,
+        animationProgress: 0,
+        animationDuration: 200
+      },
+      // Wall 3: C8-D8 moving to D8-E8
+      {
+        position1: { x: 2, y: 8, side: 'right' }, // C8-D8
+        position2: { x: 3, y: 8, side: 'right' }, // D8-E8
+        currentPosition: 1,
+        timer: 0,
+        interval: 7000, // 7 seconds
+        animating: false,
+        animationProgress: 0,
+        animationDuration: 200
+      },
+      // Wall 4: B4-C4 (vertical) moving to C4-C5 (horizontal)
+      {
+        position1: { x: 1, y: 4, side: 'right' }, // B4-C4
+        position2: { x: 2, y: 4, side: 'bottom' }, // C4-C5
+        currentPosition: 1,
+        timer: 0,
+        interval: 4000, // 4 seconds
+        animating: false,
+        animationProgress: 0,
+        animationDuration: 200
       }
     ];
 
@@ -511,19 +562,8 @@ class TiltMazeGame {
           wall.animationProgress = 0;
 
           // Complete the wall movement after animation is done
-          if (wall.currentPosition === 1) {
-            // Horizontal I0-I1 wall
-            this.maze[0][8].walls.bottom = true; // I0 bottom wall
-            this.maze[1][8].walls.top = true; // I1 top wall
-            this.maze[1][7].walls.right = false; // H1 right wall
-            this.maze[1][8].walls.left = false; // I1 left wall
-          } else {
-            // Vertical H1-I1 wall
-            this.maze[0][8].walls.bottom = false; // I0 bottom wall
-            this.maze[1][8].walls.top = false; // I1 top wall
-            this.maze[1][7].walls.right = true; // H1 right wall
-            this.maze[1][8].walls.left = true; // I1 left wall
-          }
+          // We need to handle each wall based on its specific positions
+          this.completeWallMovement(wall);
         }
       }
       // Check if it's time to start a new wall animation
@@ -533,12 +573,115 @@ class TiltMazeGame {
         wall.animating = true;
         wall.animationProgress = 0;
 
-        // During animation, both walls are absent to avoid trapping the ball
-        this.maze[0][8].walls.bottom = false; // I0 bottom wall
-        this.maze[1][8].walls.top = false; // I1 top wall
-        this.maze[1][7].walls.right = false; // H1 right wall
-        this.maze[1][8].walls.left = false; // I1 left wall
+        // During animation, temporarily remove both walls for smooth transition
+        this.removeWallDuringAnimation(wall);
       }
+    }
+  }
+
+  // Helper method to handle the completion of wall movement for each specific wall
+  private completeWallMovement(wall: MovingWall): void {
+    const pos1 = wall.position1;
+    const pos2 = wall.position2;
+
+    // Wall 1: F4-F5 <-> G4-G5
+    if (pos1.x === 5 && pos1.y === 4) {
+      if (wall.currentPosition === 1) {
+        // F4-F5 wall (horizontal)
+        this.maze[4][5].walls.bottom = true;
+        this.maze[5][5].walls.top = true;
+        this.maze[4][6].walls.bottom = false;
+        this.maze[5][6].walls.top = false;
+      } else {
+        // G4-G5 wall (horizontal)
+        this.maze[4][5].walls.bottom = false;
+        this.maze[5][5].walls.top = false;
+        this.maze[4][6].walls.bottom = true;
+        this.maze[5][6].walls.top = true;
+      }
+    }
+    // Wall 2: I8-J8 (vertical) <-> J7-J8 (horizontal)
+    else if (pos1.x === 8 && pos1.y === 8) {
+      if (wall.currentPosition === 1) {
+        // I8-J8 wall (vertical)
+        this.maze[8][8].walls.right = true;
+        this.maze[8][9].walls.left = true;
+        this.maze[7][9].walls.bottom = false;
+        this.maze[8][9].walls.top = false;
+      } else {
+        // J7-J8 wall (horizontal)
+        this.maze[8][8].walls.right = false;
+        this.maze[8][9].walls.left = false;
+        this.maze[7][9].walls.bottom = true;
+        this.maze[8][9].walls.top = true;
+      }
+    }
+    // Wall 3: C8-D8 <-> D8-E8
+    else if (pos1.x === 2 && pos1.y === 8) {
+      if (wall.currentPosition === 1) {
+        // C8-D8 wall
+        this.maze[8][2].walls.right = true;
+        this.maze[8][3].walls.left = true;
+        this.maze[8][3].walls.right = false;
+        this.maze[8][4].walls.left = false;
+      } else {
+        // D8-E8 wall
+        this.maze[8][2].walls.right = false;
+        this.maze[8][3].walls.left = false;
+        this.maze[8][3].walls.right = true;
+        this.maze[8][4].walls.left = true;
+      }
+    }
+    // Wall 4: B4-C4 (vertical) <-> C4-C5 (horizontal)
+    else if (pos1.x === 1 && pos1.y === 4) {
+      if (wall.currentPosition === 1) {
+        // B4-C4 wall (vertical)
+        this.maze[4][1].walls.right = true;
+        this.maze[4][2].walls.left = true;
+        this.maze[4][2].walls.bottom = false;
+        this.maze[5][2].walls.top = false;
+      } else {
+        // C4-C5 wall (horizontal)
+        this.maze[4][1].walls.right = false;
+        this.maze[4][2].walls.left = false;
+        this.maze[4][2].walls.bottom = true;
+        this.maze[5][2].walls.top = true;
+      }
+    }
+  }
+
+  // Helper method to temporarily remove walls during animation
+  private removeWallDuringAnimation(wall: MovingWall): void {
+    const pos1 = wall.position1;
+    const pos2 = wall.position2;
+
+    // Wall 1: F4-F5 <-> G4-G5
+    if (pos1.x === 5 && pos1.y === 4) {
+      this.maze[4][5].walls.bottom = false;
+      this.maze[5][5].walls.top = false;
+      this.maze[4][6].walls.bottom = false;
+      this.maze[5][6].walls.top = false;
+    }
+    // Wall 2: I8-J8 (vertical) <-> J7-J8 (horizontal)
+    else if (pos1.x === 8 && pos1.y === 8) {
+      this.maze[8][8].walls.right = false;
+      this.maze[8][9].walls.left = false;
+      this.maze[7][9].walls.bottom = false;
+      this.maze[8][9].walls.top = false;
+    }
+    // Wall 3: C8-D8 <-> D8-E8
+    else if (pos1.x === 2 && pos1.y === 8) {
+      this.maze[8][2].walls.right = false;
+      this.maze[8][3].walls.left = false;
+      this.maze[8][3].walls.right = false;
+      this.maze[8][4].walls.left = false;
+    }
+    // Wall 4: B4-C4 (vertical) <-> C4-C5 (horizontal)
+    else if (pos1.x === 1 && pos1.y === 4) {
+      this.maze[4][1].walls.right = false;
+      this.maze[4][2].walls.left = false;
+      this.maze[4][2].walls.bottom = false;
+      this.maze[5][2].walls.top = false;
     }
   }
 
