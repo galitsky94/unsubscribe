@@ -229,7 +229,7 @@
 
       <!-- First Screen: Initial Unsubscribe Warning -->
       <div id="initial-screen" class="screen">
-        <h1>You're about to unsubscribe. The action is irreversible...</h1>
+        <h1>You're about to unsubscribe.</h1>
         <p>Once you unsubscribe, you'll lose access to all premium features and benefits of our service.</p>
         <button id="unsubscribe-button">Unsubscribe</button>
       </div>
@@ -239,13 +239,6 @@
         <h1>Are you sure?</h1>
         <p>This action will permanently remove you from our mailing list and you'll miss out on exclusive deals and offers.</p>
         <button id="confirm-button">Hell Yeah</button>
-      </div>
-
-      <!-- Third Screen: Game screen - initially hidden -->
-      <div id="game-start-screen" class="screen hidden">
-        <h2>We're sorry to see you go!</h2>
-        <p>Your account will be deactivated after completing one final step.</p>
-        <button id="start-game-button">Continue</button>
       </div>
 
       <!-- Original Start Screen (kept for compatibility with main.ts) -->
@@ -298,14 +291,12 @@
         // Screen elements
         const initialScreen = document.getElementById('initial-screen');
         const confirmScreen = document.getElementById('confirm-screen');
-        const gameStartScreen = document.getElementById('game-start-screen');
         const captchaPopup = document.getElementById('captcha-popup');
         const originalStartScreen = document.getElementById('start-screen');
 
         // Button elements
         const unsubscribeButton = document.getElementById('unsubscribe-button');
         const confirmButton = document.getElementById('confirm-button');
-        const startGameButton = document.getElementById('start-game-button');
         const captchaContinueButton = document.getElementById('captcha-continue');
         const originalStartButton = document.getElementById('start-button');
 
@@ -322,20 +313,17 @@
           confirmScreen.classList.remove('hidden');
         });
 
-        // Second screen -> Third screen with captcha
+        // Second screen -> Captcha popup
         confirmButton.addEventListener('click', function() {
           confirmScreen.classList.add('hidden');
-          gameStartScreen.classList.remove('hidden');
-          // Show captcha popup
-          setTimeout(function() {
-            captchaPopup.classList.remove('hidden');
-          }, 500);
+
+          // Show captcha popup directly
+          captchaPopup.classList.remove('hidden');
         });
 
         // Captcha continue -> Start actual game
         captchaContinueButton.addEventListener('click', function() {
           captchaPopup.classList.add('hidden');
-          gameStartScreen.classList.add('hidden');
 
           // Show original start screen which has the event listener from main.ts
           originalStartScreen.classList.remove('hidden');
