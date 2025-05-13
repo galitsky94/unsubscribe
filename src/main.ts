@@ -270,10 +270,10 @@ class TiltMazeGame {
 
     // Setup all four moving walls as requested:
 
-    // 1. Wall between F4-F5 moving to G4-G5
-    maze[4][5].walls.bottom = true; // F4-F5 wall - starting position
-    maze[5][5].walls.top = true;    // F5 top
-    maze[4][6].walls.bottom = false; // G4-G5 wall - not present initially
+    // 1. Wall between F4-G4 (vertical) moving to G4-G5 (horizontal)
+    maze[4][5].walls.right = true; // F4-G4 wall (vertical) - starting position
+    maze[4][6].walls.left = true;  // G4 left
+    maze[4][6].walls.bottom = false; // G4-G5 wall (horizontal) - not present initially
     maze[5][6].walls.top = false;    // G5 top
 
     // 2. Wall between I8-J8 (vertical) moving to J7-J8 (horizontal)
@@ -296,16 +296,16 @@ class TiltMazeGame {
 
     // Update moving walls data structure to track all four walls
     this.movingWalls = [
-      // Wall 1: F4-F5 moving to G4-G5 (horizontal movement)
+      // Wall 1: F4-G4 (vertical) moving to G4-G5 (horizontal)
       {
-        position1: { x: 5, y: 4, side: 'bottom' }, // F4-F5
-        position2: { x: 6, y: 4, side: 'bottom' }, // G4-G5
+        position1: { x: 5, y: 4, side: 'right' }, // F4-G4 (vertical)
+        position2: { x: 6, y: 4, side: 'bottom' }, // G4-G5 (horizontal)
         currentPosition: 1,
         timer: 0,
-        interval: 5000, // 5 seconds
+        interval: 3000, // 3 seconds
         animating: false,
         animationProgress: 0,
-        animationDuration: 200 // 200ms animation
+        animationDuration: 300 // 300ms animation - slightly longer for smoother transition
       },
       // Wall 2: I8-J8 (vertical) moving to J7-J8 (horizontal)
       {
@@ -313,10 +313,10 @@ class TiltMazeGame {
         position2: { x: 9, y: 7, side: 'bottom' }, // J7-J8
         currentPosition: 1,
         timer: 0,
-        interval: 6000, // 6 seconds (slightly different timing)
+        interval: 3000, // 3 seconds
         animating: false,
         animationProgress: 0,
-        animationDuration: 200
+        animationDuration: 300
       },
       // Wall 3: C8-D8 moving to D8-E8
       {
@@ -324,10 +324,10 @@ class TiltMazeGame {
         position2: { x: 3, y: 8, side: 'right' }, // D8-E8
         currentPosition: 1,
         timer: 0,
-        interval: 7000, // 7 seconds
+        interval: 3000, // 3 seconds
         animating: false,
         animationProgress: 0,
-        animationDuration: 200
+        animationDuration: 300
       },
       // Wall 4: B4-C4 (vertical) moving to C4-C5 (horizontal)
       {
@@ -335,10 +335,10 @@ class TiltMazeGame {
         position2: { x: 2, y: 4, side: 'bottom' }, // C4-C5
         currentPosition: 1,
         timer: 0,
-        interval: 4000, // 4 seconds
+        interval: 3000, // 3 seconds
         animating: false,
         animationProgress: 0,
-        animationDuration: 200
+        animationDuration: 300
       }
     ];
 
@@ -584,18 +584,18 @@ class TiltMazeGame {
     const pos1 = wall.position1;
     const pos2 = wall.position2;
 
-    // Wall 1: F4-F5 <-> G4-G5
+    // Wall 1: F4-G4 (vertical) <-> G4-G5 (horizontal)
     if (pos1.x === 5 && pos1.y === 4) {
       if (wall.currentPosition === 1) {
-        // F4-F5 wall (horizontal)
-        this.maze[4][5].walls.bottom = true;
-        this.maze[5][5].walls.top = true;
+        // F4-G4 wall (vertical)
+        this.maze[4][5].walls.right = true;
+        this.maze[4][6].walls.left = true;
         this.maze[4][6].walls.bottom = false;
         this.maze[5][6].walls.top = false;
       } else {
         // G4-G5 wall (horizontal)
-        this.maze[4][5].walls.bottom = false;
-        this.maze[5][5].walls.top = false;
+        this.maze[4][5].walls.right = false;
+        this.maze[4][6].walls.left = false;
         this.maze[4][6].walls.bottom = true;
         this.maze[5][6].walls.top = true;
       }
@@ -655,10 +655,10 @@ class TiltMazeGame {
     const pos1 = wall.position1;
     const pos2 = wall.position2;
 
-    // Wall 1: F4-F5 <-> G4-G5
+    // Wall 1: F4-G4 (vertical) <-> G4-G5 (horizontal)
     if (pos1.x === 5 && pos1.y === 4) {
-      this.maze[4][5].walls.bottom = false;
-      this.maze[5][5].walls.top = false;
+      this.maze[4][5].walls.right = false;
+      this.maze[4][6].walls.left = false;
       this.maze[4][6].walls.bottom = false;
       this.maze[5][6].walls.top = false;
     }
