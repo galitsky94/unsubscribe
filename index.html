@@ -248,6 +248,13 @@
         <button id="start-game-button">Continue</button>
       </div>
 
+      <!-- Original Start Screen (kept for compatibility with main.ts) -->
+      <div id="start-screen" class="screen hidden">
+        <h1>Tilt Maze</h1>
+        <p>Tilt your device to guide the ball from start to finish!</p>
+        <button id="start-button">Start Game</button>
+      </div>
+
       <!-- Win Screen -->
       <div id="win-screen" class="screen hidden">
         <h1>You Won!</h1>
@@ -293,12 +300,14 @@
         const confirmScreen = document.getElementById('confirm-screen');
         const gameStartScreen = document.getElementById('game-start-screen');
         const captchaPopup = document.getElementById('captcha-popup');
+        const originalStartScreen = document.getElementById('start-screen');
 
         // Button elements
         const unsubscribeButton = document.getElementById('unsubscribe-button');
         const confirmButton = document.getElementById('confirm-button');
         const startGameButton = document.getElementById('start-game-button');
         const captchaContinueButton = document.getElementById('captcha-continue');
+        const originalStartButton = document.getElementById('start-button');
 
         // Flash sale popup elements
         let flashPopupShown = false;
@@ -326,19 +335,24 @@
         // Captcha continue -> Start actual game
         captchaContinueButton.addEventListener('click', function() {
           captchaPopup.classList.add('hidden');
-          // This will trigger the game to start in the main.ts file
-          startGameButton.click();
+          gameStartScreen.classList.add('hidden');
+
+          // Show original start screen which has the event listener from main.ts
+          originalStartScreen.classList.remove('hidden');
+
+          // Auto-click the start button after a short delay
+          setTimeout(function() {
+            originalStartButton.click();
+          }, 100);
         });
 
-        // Start game and hide the game start screen
-        startGameButton.addEventListener('click', function() {
-          gameStartScreen.classList.add('hidden');
-          // This would normally be handled by the startGame method in main.ts
-          // But we'll simulate that here since we're overriding the flow
-          const startButton = document.getElementById('start-button');
-          if (startButton) {
-            startButton.click();
-          }
+        // Handle original start button
+        originalStartButton.addEventListener('click', function() {
+          // When the original start button is clicked (either by user or programmatically),
+          // we need to make sure the original start screen is hidden
+          originalStartScreen.classList.add('hidden');
+
+          // Wait 5 seconds and show flash popup
           setTimeout(showFlashPopup, 5000);
         });
 
@@ -350,15 +364,17 @@
             // Start countdown timer
             let seconds = 59;
             const countdownEl = document.querySelector('.sale-countdown');
-            const countdownInterval = setInterval(() => {
-              seconds--;
-              if (seconds < 0) {
-                clearInterval(countdownInterval);
-                return;
-              }
-              const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
-              countdownEl.textContent = `Offer ends in: 00:${displaySeconds}`;
-            }, 1000);
+            if (countdownEl) {
+              const countdownInterval = setInterval(() => {
+                seconds--;
+                if (seconds < 0) {
+                  clearInterval(countdownInterval);
+                  return;
+                }
+                const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
+                countdownEl.textContent = `Offer ends in: 00:${displaySeconds}`;
+              }, 1000);
+            }
           }
         }
 
