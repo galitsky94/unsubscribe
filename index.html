@@ -35,7 +35,7 @@
 
       #timer-container {
         position: absolute;
-        top: 10px;
+        top: -40px;
         left: 0;
         width: 100%;
         text-align: center;
@@ -43,13 +43,10 @@
       }
 
       #timer {
-        background-color: rgba(255, 255, 255, 0.8);
         padding: 5px 15px;
-        border-radius: 20px;
         font-size: 1.2rem;
         font-weight: bold;
         color: #333;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         display: inline-block;
       }
 
@@ -255,48 +252,48 @@
         max-width: 500px;
       }
 
-      /* Hurry Up Popup */
+      /* Hurry Up Screen */
       #hurry-popup {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 350px;
-        background-color: #FF5252;
-        border-radius: 8px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
         z-index: 35;
         text-align: center;
         padding: 20px;
-        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
-      }
-
-      @keyframes shake {
-        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-        10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%) rotate(-1deg); }
-        20%, 40%, 60%, 80% { transform: translate(-49%, -50%) rotate(1deg); }
+        box-sizing: border-box;
       }
 
       .hurry-header {
-        color: white;
-        font-size: 1.8rem;
+        color: #FF5252;
+        font-size: 2rem;
         font-weight: bold;
         margin-bottom: 15px;
+        max-width: 500px;
+        animation: pulse 1s infinite;
       }
 
       .hurry-body {
-        color: white;
-        margin-bottom: 15px;
+        color: #666;
+        margin-bottom: 20px;
+        text-align: center;
+        padding: 0 20px;
+        max-width: 450px;
       }
 
       #hurry-continue {
-        background-color: white;
-        color: #FF5252;
+        background-color: #4CAF50;
+        color: white;
       }
 
       #hurry-continue:hover {
-        background-color: #f0f0f0;
+        background-color: #45a049;
       }
     </style>
   </head>
@@ -328,10 +325,9 @@
 
       <!-- Win Screen -->
       <div id="win-screen" class="screen hidden">
-        <h1>You Won!</h1>
-        <p>Congratulations on completing the maze!</p>
+        <h1>Unsubscribed Successfully!</h1>
+        <p>Your request has been processed. Thank you.</p>
         <p id="completion-time"></p>
-        <button id="restart-button">Play Again</button>
       </div>
 
       <!-- Captcha Popup -->
@@ -392,7 +388,6 @@
         const confirmButton = document.getElementById('confirm-button');
         const captchaContinueButton = document.getElementById('captcha-continue');
         const originalStartButton = document.getElementById('start-button');
-        const restartButton = document.getElementById('restart-button');
 
         // Flash sale popup elements
         let flashPopupShown = false;
@@ -545,7 +540,7 @@
 
                 // Display completion time
                 const timeUsed = totalTime - timeLeft;
-                completionTimeEl.textContent = `You completed the puzzle in ${timeUsed} seconds!`;
+                completionTimeEl.textContent = `Unsubscription processed in ${timeUsed} seconds.`;
 
                 // Hide timer
                 timerContainer.classList.add('hidden');
@@ -557,26 +552,7 @@
         // Observe win screen for class changes
         observer.observe(winScreen, { attributes: true });
 
-        // Reset game and timer when restart button is clicked
-        restartButton.addEventListener('click', function() {
-          // Clear existing timer if any
-          if (gameTimer) {
-            clearInterval(gameTimer);
-          }
-
-          // Reset variables
-          timeLeft = totalTime;
-          flashPopupShown = false;
-          hurryPopupShown = false;
-          timerStarted = false;
-
-          // Hide win screen and popups
-          winScreen.classList.add('hidden');
-          flashPopup.classList.add('hidden');
-          hurryPopup.classList.add('hidden');
-          timerContainer.classList.add('hidden');
-          timerElement.classList.remove('danger');
-        });
+        // No longer need restart functionality as we've removed the button
       });
     </script>
   </body>

@@ -20,6 +20,9 @@
 - [x] Remove "Tilt Maze" screen that appears before the game starts
 - [x] Increase flash sale popup timer from 5 to 10 seconds
 - [x] Increase captcha header font size to match the main title style
+- [x] Add 30-second timer to complete the maze
+- [x] Add hurry-up popup when 10 seconds remain
+- [x] Display completion time on win screen
 
 ## In Progress
 - [ ] None
