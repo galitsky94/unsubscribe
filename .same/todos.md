@@ -19,6 +19,7 @@
 - [x] Implement multi-step unsubscribe flow
 - [x] Remove "Tilt Maze" screen that appears before the game starts
 - [x] Increase flash sale popup timer from 5 to 10 seconds
+- [x] Increase captcha header font size to match the main title style
 
 ## In Progress
 - [ ] None

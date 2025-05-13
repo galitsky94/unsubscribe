@@ -33,6 +33,37 @@
         height: 100%;
       }
 
+      #timer-container {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 5;
+      }
+
+      #timer {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        display: inline-block;
+      }
+
+      .danger {
+        color: #FF5252 !important;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+
       .screen {
         position: absolute;
         top: 0;
@@ -223,11 +254,58 @@
         margin-bottom: 15px;
         max-width: 500px;
       }
+
+      /* Hurry Up Popup */
+      #hurry-popup {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 350px;
+        background-color: #FF5252;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        z-index: 35;
+        text-align: center;
+        padding: 20px;
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+        10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%) rotate(-1deg); }
+        20%, 40%, 60%, 80% { transform: translate(-49%, -50%) rotate(1deg); }
+      }
+
+      .hurry-header {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .hurry-body {
+        color: white;
+        margin-bottom: 15px;
+      }
+
+      #hurry-continue {
+        background-color: white;
+        color: #FF5252;
+      }
+
+      #hurry-continue:hover {
+        background-color: #f0f0f0;
+      }
     </style>
   </head>
   <body>
     <div id="game-container">
       <canvas id="maze-canvas"></canvas>
+      <div id="timer-container" class="hidden">
+        <div id="timer">Time left: 30s</div>
+      </div>
 
       <!-- First Screen: Initial Unsubscribe Warning -->
       <div id="initial-screen" class="screen">
@@ -252,6 +330,7 @@
       <div id="win-screen" class="screen hidden">
         <h1>You Won!</h1>
         <p>Congratulations on completing the maze!</p>
+        <p id="completion-time"></p>
         <button id="restart-button">Play Again</button>
       </div>
 
@@ -281,6 +360,18 @@
           <button id="decline-offer">No thanks</button>
         </div>
       </div>
+
+      <!-- Hurry Up Popup -->
+      <div id="hurry-popup" class="hidden">
+        <div class="hurry-header">
+          HURRY UP!
+        </div>
+        <div class="hurry-body">
+          <p>Only <strong>10 seconds</strong> left to complete the puzzle!</p>
+          <p>Don't miss your chance to unsubscribe!</p>
+        </div>
+        <button id="hurry-continue">Continue</button>
+      </div>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
@@ -293,12 +384,15 @@
         const confirmScreen = document.getElementById('confirm-screen');
         const captchaPopup = document.getElementById('captcha-popup');
         const originalStartScreen = document.getElementById('start-screen');
+        const winScreen = document.getElementById('win-screen');
+        const completionTimeEl = document.getElementById('completion-time');
 
         // Button elements
         const unsubscribeButton = document.getElementById('unsubscribe-button');
         const confirmButton = document.getElementById('confirm-button');
         const captchaContinueButton = document.getElementById('captcha-continue');
         const originalStartButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
 
         // Flash sale popup elements
         let flashPopupShown = false;
@@ -332,14 +426,77 @@
           originalStartButton.click();
         });
 
+        // Get timer elements
+        const timerContainer = document.getElementById('timer-container');
+        const timerElement = document.getElementById('timer');
+
+        // Get hurry popup elements
+        const hurryPopup = document.getElementById('hurry-popup');
+        const hurryContinueBtn = document.getElementById('hurry-continue');
+
+        // Timer variables
+        let gameTimer;
+        let totalTime = 30;
+        let timeLeft = totalTime;
+        let timerStarted = false;
+        let hurryPopupShown = false;
+
+        // Start the game timer
+        function startGameTimer() {
+          timeLeft = totalTime;
+          timerElement.textContent = `Time left: ${timeLeft}s`;
+          timerContainer.classList.remove('hidden');
+          timerStarted = true;
+
+          gameTimer = setInterval(() => {
+            timeLeft--;
+
+            // Update timer display
+            timerElement.textContent = `Time left: ${timeLeft}s`;
+
+            // When time gets low, add danger class
+            if (timeLeft <= 10) {
+              timerElement.classList.add('danger');
+            }
+
+            // Show flash sale popup after 5 seconds of gameplay (25 seconds left)
+            if (timeLeft === totalTime - 5 && !flashPopupShown) {
+              showFlashPopup();
+            }
+
+            // Show hurry up popup when 10 seconds left
+            if (timeLeft === 10 && !hurryPopupShown) {
+              showHurryPopup();
+            }
+
+            // Time's up
+            if (timeLeft <= 0) {
+              clearInterval(gameTimer);
+              alert("Time's up! You've failed to unsubscribe in time.");
+              window.location.reload(); // Reload the page to start over
+            }
+          }, 1000);
+        }
+
+        // Show the hurry up popup
+        function showHurryPopup() {
+          hurryPopup.classList.remove('hidden');
+          hurryPopupShown = true;
+        }
+
+        // Close the hurry popup
+        hurryContinueBtn.addEventListener('click', function() {
+          hurryPopup.classList.add('hidden');
+        });
+
         // Handle original start button
         originalStartButton.addEventListener('click', function() {
           // When the original start button is clicked (either by user or programmatically),
           // we need to make sure the original start screen is hidden
           originalStartScreen.classList.add('hidden');
 
-          // Wait 10 seconds and show flash popup
-          setTimeout(showFlashPopup, 10000);
+          // Start the game timer
+          startGameTimer();
         });
 
         function showFlashPopup() {
@@ -375,6 +532,51 @@
           closeFlashPopup();
         });
         declineBtn.addEventListener('click', closeFlashPopup);
+
+        // Listen for when the game is won to stop the timer
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' &&
+                mutation.attributeName === 'class' &&
+                !winScreen.classList.contains('hidden')) {
+              // Game is won - stop timer
+              if (gameTimer) {
+                clearInterval(gameTimer);
+
+                // Display completion time
+                const timeUsed = totalTime - timeLeft;
+                completionTimeEl.textContent = `You completed the puzzle in ${timeUsed} seconds!`;
+
+                // Hide timer
+                timerContainer.classList.add('hidden');
+              }
+            }
+          });
+        });
+
+        // Observe win screen for class changes
+        observer.observe(winScreen, { attributes: true });
+
+        // Reset game and timer when restart button is clicked
+        restartButton.addEventListener('click', function() {
+          // Clear existing timer if any
+          if (gameTimer) {
+            clearInterval(gameTimer);
+          }
+
+          // Reset variables
+          timeLeft = totalTime;
+          flashPopupShown = false;
+          hurryPopupShown = false;
+          timerStarted = false;
+
+          // Hide win screen and popups
+          winScreen.classList.add('hidden');
+          flashPopup.classList.add('hidden');
+          hurryPopup.classList.add('hidden');
+          timerContainer.classList.add('hidden');
+          timerElement.classList.remove('danger');
+        });
       });
     </script>
   </body>
