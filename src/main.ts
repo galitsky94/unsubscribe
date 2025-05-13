@@ -87,7 +87,21 @@ class TiltMazeGame {
 
     this.setupEventListeners();
     this.resize();
-    this.showStartScreen();
+
+    // Hide the start button if the new flow is being used
+    // We'll check for the presence of our custom initial screen
+    const initialScreen = document.getElementById('initial-screen');
+    const startScreen = document.getElementById('start-screen');
+
+    if (initialScreen) {
+      // New flow is being used - don't show the start screen
+      if (startScreen) {
+        startScreen.classList.add('hidden');
+      }
+    } else {
+      // Original flow - show start screen
+      this.showStartScreen();
+    }
   }
 
   private setupCanvas(): void {
