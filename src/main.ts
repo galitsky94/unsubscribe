@@ -564,14 +564,17 @@ class TiltMazeGame {
           // Complete the wall movement after animation is done
           // We need to handle each wall based on its specific positions
           this.completeWallMovement(wall);
+
+          // Reset the timer after the animation completes to ensure
+          // the wall stays in the new position for the full interval
+          wall.timer = currentTime;
         }
       }
       // Check if it's time to start a new wall animation
       else if (currentTime - wall.timer > wall.interval) {
-        wall.timer = currentTime;
-        wall.currentPosition = wall.currentPosition === 1 ? 2 : 1;
         wall.animating = true;
         wall.animationProgress = 0;
+        wall.currentPosition = wall.currentPosition === 1 ? 2 : 1;
 
         // During animation, temporarily remove both walls for smooth transition
         this.removeWallDuringAnimation(wall);
