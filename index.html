@@ -241,11 +241,9 @@
         <button id="confirm-button">Hell Yeah</button>
       </div>
 
-      <!-- Original Start Screen (kept for compatibility with main.ts) -->
+      <!-- Original Start Screen (kept for compatibility with main.ts, but now without text) -->
       <div id="start-screen" class="screen hidden">
-        <h1>Tilt Maze</h1>
-        <p>Tilt your device to guide the ball from start to finish!</p>
-        <button id="start-button">Start Game</button>
+        <button id="start-button" class="hidden">Start Game</button>
       </div>
 
       <!-- Win Screen -->
@@ -325,13 +323,11 @@
         captchaContinueButton.addEventListener('click', function() {
           captchaPopup.classList.add('hidden');
 
-          // Show original start screen which has the event listener from main.ts
+          // Show original start screen with hidden button
           originalStartScreen.classList.remove('hidden');
 
-          // Auto-click the start button after a short delay
-          setTimeout(function() {
-            originalStartButton.click();
-          }, 100);
+          // Auto-click the start button immediately to bypass the original screen
+          originalStartButton.click();
         });
 
         // Handle original start button
@@ -340,8 +336,8 @@
           // we need to make sure the original start screen is hidden
           originalStartScreen.classList.add('hidden');
 
-          // Wait 5 seconds and show flash popup
-          setTimeout(showFlashPopup, 5000);
+          // Wait 10 seconds and show flash popup
+          setTimeout(showFlashPopup, 10000);
         });
 
         function showFlashPopup() {
